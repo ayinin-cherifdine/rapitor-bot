@@ -9,7 +9,7 @@ from supabase import create_client
 
 # --- CONFIGURATION (À REMPLIR) ---
 SUPABASE_URL = "https://tomecezwlczrvhmfwbyd.supabase.co"
-SUPABASE_KEY = "sb_publishable_Ljuo9him197aeahFZfcr-A_Mii_9ZK-"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvbWVjZXp3bGN6cnZobWZ3YnlkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDMxNjA1MSwiZXhwIjoyMDg1ODkyMDUxfQ.BGL0txP91M6JpBWxsqMIvpJiyVLqzYhEie_BgqoJqYM"
 BOT_TOKEN = "8372739692:AAHD-Mb92L69Ku0Mq4NWlKV3lq7W_GDPdCQ"
 ADMIN_ID = 7516367607
 
