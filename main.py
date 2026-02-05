@@ -1,3 +1,4 @@
+import os
 import os, random, string, asyncio
 from datetime import datetime
 from flask import Flask, request, jsonify
@@ -8,10 +9,10 @@ from threading import Thread
 from supabase import create_client
 
 # --- CONFIGURATION (À REMPLIR) ---
-SUPABASE_URL = "https://tomecezwlczrvhmfwbyd.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvbWVjZXp3bGN6cnZobWZ3YnlkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDMxNjA1MSwiZXhwIjoyMDg1ODkyMDUxfQ.BGL0txP91M6JpBWxsqMIvpJiyVLqzYhEie_BgqoJqYM"
-BOT_TOKEN = "8372739692:AAHD-Mb92L69Ku0Mq4NWlKV3lq7W_GDPdCQ"
-ADMIN_ID = 7516367607
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
+ADMIN_ID = int(os.environ.get("ADMIN_ID", 0))
 
 # Connexion Supabase
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
