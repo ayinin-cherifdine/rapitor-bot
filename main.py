@@ -8,8 +8,8 @@ from threading import Thread
 from supabase import create_client
 
 # --- CONFIGURATION (À REMPLIR) ---
-SUPABASE_URL = "https://votre-projet.supabase.co"
-SUPABASE_KEY = "votre-cle-api-anon"
+SUPABASE_URL = "https://tomecezwlczrvhmfwbyd.supabase.co"
+SUPABASE_KEY = "sb_publishable_Ljuo9him197aeahFZfcr-A_Mii_9ZK-"
 BOT_TOKEN = "8372739692:AAHD-Mb92L69Ku0Mq4NWlKV3lq7W_GDPdCQ"
 ADMIN_ID = 7516367607
 
