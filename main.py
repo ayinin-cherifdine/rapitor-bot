@@ -1,55 +1,46 @@
-import os, sqlite3, random, string, asyncio, nest_asyncio
+import os, random, string, asyncio
 from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 from threading import Thread
+from supabase import create_client
 
-# --- CONFIGURATION KOYEB (VOLUME) ---
-# On utilise le chemin du Volume qu'on va créer
-DB_FOLDER = "/workspace/db"
-DB_NAME = os.path.join(DB_FOLDER, "rapitor_vault.db")
+# --- CONFIGURATION (À REMPLIR) ---
+SUPABASE_URL = "https://votre-projet.supabase.co"
+SUPABASE_KEY = "votre-cle-api-anon"
+BOT_TOKEN = "8372739692:AAHD-Mb92L69Ku0Mq4NWlKV3lq7W_GDPdCQ"
+ADMIN_ID = 7516367607
 
-# --- 💾 DB INIT ---
-def init_db():
-    if not os.path.exists(DB_FOLDER):
-        os.makedirs(DB_FOLDER)
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-    c.execute('CREATE TABLE IF NOT EXISTS keys (key TEXT PRIMARY KEY, plan TEXT, hwid TEXT, created_at TEXT, status TEXT)')
-    conn.commit()
-    conn.close()
+# Connexion Supabase
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 app = Flask(__name__)
 CORS(app)
 
 @app.route('/')
-def home():
-    return "🦅 RAPITOR TITAN BACKEND v15.0 - ACTIVE"
+def home(): 
+    return "🦅 RAPITOR TITAN BACKEND ACTIVE"
 
 @app.route('/verify', methods=['POST'])
 def verify():
     data = request.json
     key, hwid = data.get('key'), data.get('hwid')
-    conn = sqlite3.connect(DB_NAME)
-    conn.row_factory = sqlite3.Row
-    row = conn.execute("SELECT * FROM keys WHERE key=?", (key,)).fetchone()
     
-    if not row or row['status'] == 'REVOKED':
+    # Vérification dans Supabase
+    res = supabase.table("keys").select("*").eq("key", key).execute()
+    if not res.data or res.data[0]['status'] == 'REVOKED':
         return jsonify({"status": "error", "message": "REVOKED"})
     
+    row = res.data[0]
     if row['hwid'] is None:
-        conn.execute("UPDATE keys SET hwid=?, status='ACTIVE' WHERE key=?", (hwid, key))
-        conn.commit()
+        supabase.table("keys").update({"hwid": hwid, "status": "ACTIVE"}).eq("key", key).execute()
         return jsonify({"status": "success", "plan": row['plan']})
     
     return jsonify({"status": "success"}) if row['hwid'] == hwid else jsonify({"status": "error", "message": "HWID_MISMATCH"})
 
-# --- 🤖 TELEGRAM ADMIN ---
-BOT_TOKEN = "8372739692:AAHD-Mb92L69Ku0Mq4NWlKV3lq7W_GDPdCQ"
-ADMIN_ID = 7516367607
-
+# --- BOT TELEGRAM ---
 async def start(u: Update, c: ContextTypes.DEFAULT_TYPE):
     if u.effective_user.id != ADMIN_ID: return
     kb = [[InlineKeyboardButton("💎 GEN VIP", callback_data='gen_vip'), InlineKeyboardButton("🔥 GEN PREM", callback_data='gen_prem')]]
@@ -59,18 +50,20 @@ async def handle_btns(u: Update, c: ContextTypes.DEFAULT_TYPE):
     q = u.callback_query
     await q.answer()
     plan = "VIP" if "vip" in q.data else "PREMIUM"
-    key = f"RAPITOR-{ ''.join(random.choices(string.ascii_uppercase + string.digits, k=12)) }"
-    conn = sqlite3.connect(DB_NAME)
-    conn.execute("INSERT INTO keys VALUES (?, ?, NULL, ?, 'PENDING')", (key, plan, datetime.now()))
-    conn.commit()
-    await q.edit_message_text(f"✅ NEW KEY: {key}\nPlan: {plan}")
+    new_key = f"RAPITOR-{ ''.join(random.choices(string.ascii_uppercase + string.digits, k=12)) }"
+    
+    # Insertion dans Supabase
+    supabase.table("keys").insert({
+        "key": new_key, 
+        "plan": plan, 
+        "status": "PENDING", 
+        "created_at": str(datetime.now())
+    }).execute()
+    
+    await q.edit_message_text(f"✅ NEW KEY: {new_key}\nPlan: {plan}")
 
 if __name__ == "__main__":
-    init_db()
-    nest_asyncio.apply()
-    
-    # Port 8000 par défaut sur Koyeb
-    port = int(os.environ.get("PORT", 8000))
+    port = int(os.environ.get("PORT", 5000))
     Thread(target=lambda: app.run(host='0.0.0.0', port=port)).start()
     
     bot = Application.builder().token(BOT_TOKEN).build()
