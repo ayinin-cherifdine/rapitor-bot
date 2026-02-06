@@ -45,7 +45,7 @@ def verify():
 async def start(u: Update, c: ContextTypes.DEFAULT_TYPE):
     if u.effective_user.id != ADMIN_ID: return
     kb = [[InlineKeyboardButton("💎 GEN VIP", callback_data='gen_vip'), InlineKeyboardButton("🔥 GEN PREM", callback_data='gen_prem')]]
-    await u.message.reply_text("🦅 RAPITOR COMMAND", reply_markup=InlineKeyboardMarkup(kb))
+    await u.message.reply_text("🐍 RAPTOR COMMAND", reply_markup=InlineKeyboardMarkup(kb))
 
 async def handle_btns(u: Update, c: ContextTypes.DEFAULT_TYPE):
     q = u.callback_query
