@@ -51,7 +51,7 @@ async def handle_btns(u: Update, c: ContextTypes.DEFAULT_TYPE):
     q = u.callback_query
     await q.answer()
     plan = "VIP" if "vip" in q.data else "PREMIUM"
-    new_key = f"RAPITOR-{ ''.join(random.choices(string.ascii_uppercase + string.digits, k=12)) }"
+    new_key = f"RAPTOR-{ ''.join(random.choices(string.ascii_uppercase + string.digits, k=12)) }"
     
     # Insertion dans Supabase
     supabase.table("keys").insert({
